@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 import Control.Monad((=<<))
 import Control.Applicative((<$>))
 

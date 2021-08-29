@@ -1,5 +1,6 @@
-import Control.Monad((=<<))
-import Control.Applicative((<$>))
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
+
 
 
 
@@ -159,20 +160,6 @@ sub z n (ApplyDB g h) = ApplyDB newG newH
             newH = sub z n h
 
 
--- brunjMap :: (Int -> Int)  -> Int -> TermDB -> TermDB     -- Not possible with debrunj terms but i wanna mess around with this. 
--- brunjMap f p (VariableDB x) = if p-1 > 0 then VariableDB (f x) else VariableDB x
--- brunjMap f p (LambdaDB y)  = LambdaDB (brunjMap f (p+1) y)
--- brunjMap f p (ApplyDB z s) = ApplyDB (brunjMap f p z) (brunjMap f p s)
-
-
--- isClosed :: TermDB -> Bool
--- isClosed t = go 0 t
---     where
---     go :: Int -> TermDB -> Bool
---     go n (VariableDB i) = i < n
---     go n (LambdaDB j) = go (n + 1) j
---     go n (ApplyDB f x) = go n f && go n x
-
 
 reversee :: [a] -> [a]
 reversee xs = reverse' xs []
@@ -195,9 +182,7 @@ normal (ApplyDB z y) = zGo ++ pGo ++ weGo      --   ++ wGo -- not liking these c
           weGo = case z of
            LambdaDB h -> [ sub x y (LambdaDB h) | x <- varthere h ]
            _               -> []
-          -- wGo = case y of
-          --  LambdaDB g -> [ sub x y (LambdaDB g) | x <- varthere g ]
-          --  _               -> []
+
 
 
 beta :: TermDB -> [TermDB]
@@ -207,7 +192,7 @@ beta (ApplyDB m n) = [sub v n (VariableDB v) |v <- varthere n ] ++ [sub c m (Var
 
 varthere :: TermDB -> [VarDB]
 varthere (VariableDB i) = [i]
-varthere (LambdaDB x) = varthere x  -- optimise later merge can be used 0logn or 0nlogn again? 
+varthere (LambdaDB x) = varthere x  
 varthere (ApplyDB z y) = merge (varthere z) (varthere y)
 
 
@@ -217,7 +202,10 @@ normalize term = print (normal term)
 
 -- ------------------------- Assignment 5
 
--- isalpha :: Term -> Term -> Bool
--- isalpha = undefined
+
+isalpha :: Term -> Term -> Bool
+isalpha x y
+  | null (free x) || null (free y) = False
+  | otherwise = free x == free y
 
 
